@@ -6,12 +6,21 @@ import { X } from 'lucide-react';
 interface Service {
   id: string;
   name: string;
+  category: string;
   price_rwf: number;
 }
+
+const categoryLabels: Record<string, string> = {
+  wash_fold: "Wash & Fold",
+  wash_iron: "Wash & Iron Per Item",
+  iron_only: "Iron Only",
+  specialty: "Specialty Cleaning",
+};
 
 export default function WhatsAppFloat({ services }: { services: Service[] }) {
   const [showDialog, setShowDialog] = useState(false);
   const [message, setMessage] = useState('');
+  const [category, setCategory] = useState('');
   const [service, setService] = useState('');
 
   const handleSend = () => {
@@ -19,8 +28,12 @@ export default function WhatsAppFloat({ services }: { services: Service[] }) {
     window.open(`https://wa.me/250784649169?text=${encodeURIComponent(text)}`, '_blank');
     setShowDialog(false);
     setMessage('');
+    setCategory('');
     setService('');
   };
+
+  const categories = [...new Set(services.map(s => s.category))];
+  const filteredServices = category ? services.filter(s => s.category === category) : [];
 
   return (
     <>
@@ -47,14 +60,31 @@ export default function WhatsAppFloat({ services }: { services: Service[] }) {
             
             <div className="space-y-4">
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                <select
+                  value={category}
+                  onChange={(e) => { setCategory(e.target.value); setService(''); }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0066CC] focus:border-transparent"
+                >
+                  <option value="">Select a category</option>
+                  {categories.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {categoryLabels[cat] || cat}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Service</label>
                 <select
                   value={service}
                   onChange={(e) => setService(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0066CC] focus:border-transparent"
+                  disabled={!category}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0066CC] focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                 >
                   <option value="">Select a service</option>
-                  {services.map((s) => (
+                  {filteredServices.map((s) => (
                     <option key={s.id} value={`${s.name} - ${s.price_rwf} RWF`}>
                       {s.name} - {s.price_rwf} RWF
                     </option>
