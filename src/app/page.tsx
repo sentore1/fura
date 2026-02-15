@@ -3,7 +3,7 @@ import Hero from "@/components/hero";
 import Navbar from "@/components/navbar";
 import Carousel from "@/components/carousel";
 import Link from "next/link";
-import { ArrowRight, Shield, Clock, Star } from 'lucide-react';
+import { ArrowRight, Shield, Clock, Star, Calendar } from 'lucide-react';
 import { createClient } from "../../supabase/server";
 import { ServicesScroll } from "@/components/services-scroll";
 import WhatsAppFloat from "@/components/whatsapp-float";
@@ -16,10 +16,32 @@ export default async function Home() {
     .eq("is_active", true)
     .order("price_rwf")
     .limit(20);
+  
+  const { data: posts } = await supabase
+    .from("blog_posts")
+    .select("*")
+    .eq("is_published", true)
+    .order("created_at", { ascending: false })
+    .limit(3);
+
+  const { data: heroSlides } = await supabase
+    .from("slides")
+    .select("image_url")
+    .eq("type", "hero")
+    .eq("is_active", true)
+    .order("display_order");
+
+  const { data: carouselSlides } = await supabase
+    .from("slides")
+    .select("image_url")
+    .eq("type", "carousel")
+    .eq("is_active", true)
+    .order("display_order");
+  
   return (
     <div className="min-h-screen bg-[#F8FAFB]">
       <Navbar />
-      <Hero />
+      <Hero slides={heroSlides || undefined} />
       
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
@@ -48,7 +70,7 @@ export default async function Home() {
               <div className="text-white/80 text-sm font-medium">Years of Trust</div>
             </div>
             <div>
-              <div className="text-3xl sm:text-4xl font-extrabold mb-1 font-grotesk">2,000+</div>
+              <div className="text-3xl sm:text-4xl font-extrabold mb-1 font-grotesk">2,500+</div>
               <div className="text-white/80 text-sm font-medium">Happy Customers</div>
             </div>
             <div>
@@ -56,7 +78,7 @@ export default async function Home() {
               <div className="text-white/80 text-sm font-medium">Garments Cleaned</div>
             </div>
             <div>
-              <div className="text-3xl sm:text-4xl font-extrabold mb-1 font-grotesk">98%</div>
+              <div className="text-3xl sm:text-4xl font-extrabold mb-1 font-grotesk">99%</div>
               <div className="text-white/80 text-sm font-medium">Satisfaction Rate</div>
             </div>
           </div>
@@ -133,7 +155,52 @@ export default async function Home() {
 
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
-          <Carousel />
+          <Carousel images={carouselSlides || undefined} />
+        </div>
+      </section>
+
+      <section className="py-20 bg-[#F8FAFB]">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-14">
+            <span className="inline-block text-sm font-semibold text-[#00B8D4] uppercase tracking-wider mb-3">Latest Updates</span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#1A2332] mb-4 font-grotesk">From Our Blog</h2>
+            <p className="text-[#5A6A7A] max-w-2xl mx-auto">Tips, guides, and news about laundry care</p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {posts?.map((post) => (
+              <div key={post.id} className="bg-white rounded-xl border hover:shadow-lg transition-shadow overflow-hidden h-full">
+                {post.image_url && (
+                  <img src={post.image_url} alt={post.title} className="w-full h-48 object-cover" />
+                )}
+                <div className="p-6">
+                  <span className="text-xs font-semibold text-[#0066CC] uppercase">{post.category}</span>
+                  <h3 className="text-lg font-bold mt-2 mb-2">{post.title}</h3>
+                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">{post.excerpt}</p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center text-xs text-gray-500">
+                      <Calendar className="w-3 h-3 mr-1" />
+                      {new Date(post.created_at).toLocaleDateString()}
+                    </div>
+                    <Link href={`/blog/${post.slug}`}>
+                      <button className="text-sm font-semibold text-[#0066CC] hover:text-[#0052A3] flex items-center gap-1">
+                        Read More <ArrowRight className="w-3 h-3" />
+                      </button>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {posts && posts.length > 0 && (
+            <div className="text-center mt-10">
+              <Link href="/blog" className="inline-flex items-center text-[#0066CC] font-semibold hover:text-[#0052A3] transition-colors">
+                View All Posts
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Link>
+            </div>
+          )}
         </div>
       </section>
 

@@ -2,11 +2,16 @@ import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { Phone, Mail, MapPin, Clock, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { createClient } from "../../../supabase/server";
+import { ContactForm } from "@/components/contact/contact-form";
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const supabase = await createClient();
+  const { data: locations } = await supabase
+    .from("locations")
+    .select("*")
+    .eq("is_active", true);
+
   return (
     <div className="min-h-screen bg-[#F8FAFB]">
       <Navbar />
@@ -32,26 +37,50 @@ export default function ContactPage() {
               </p>
 
               <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#0066CC]/10 flex items-center justify-center shrink-0">
-                    <MapPin className="w-5 h-5 text-[#0066CC]" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-[#1A2332] font-grotesk">Location</h3>
-                    <p className="text-[#5A6A7A] text-sm">Kigali, Rwanda</p>
-                  </div>
-                </div>
+                {locations?.map((location) => (
+                  <div key={location.id}>
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-xl bg-[#0066CC]/10 flex items-center justify-center shrink-0">
+                        <MapPin className="w-5 h-5 text-[#0066CC]" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-[#1A2332] font-grotesk">{location.name}</h3>
+                        <p className="text-[#5A6A7A] text-sm">{location.address}</p>
+                      </div>
+                    </div>
 
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#00B8D4]/10 flex items-center justify-center shrink-0">
-                    <Phone className="w-5 h-5 text-[#00B8D4]" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-[#1A2332] font-grotesk">Phone</h3>
-                    <p className="text-[#5A6A7A] text-sm">+250 784 649 169</p>
-                  </div>
-                </div>
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-xl bg-[#00B8D4]/10 flex items-center justify-center shrink-0">
+                        <Phone className="w-5 h-5 text-[#00B8D4]" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-[#1A2332] font-grotesk">Phone</h3>
+                        <p className="text-[#5A6A7A] text-sm">{location.phone}</p>
+                      </div>
+                    </div>
 
+                    {location.whatsapp && (
+                      <div className="mb-6 p-4 bg-[#25D366]/10 rounded-xl border border-[#25D366]/20">
+                        <div className="flex items-center gap-2 mb-2">
+                          <MessageCircle className="w-5 h-5 text-[#25D366]" />
+                          <h3 className="font-semibold text-[#1A2332] text-sm">WhatsApp</h3>
+                        </div>
+                        <a
+                          href={`https://wa.me/${location.whatsapp.replace(/[^0-9]/g, '')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Button size="sm" className="bg-[#25D366] hover:bg-[#20BD5A] text-white">
+                            Chat Now
+                          </Button>
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <div className="space-y-6 mt-6 pt-6 border-t">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-xl bg-[#00C853]/10 flex items-center justify-center shrink-0">
                     <Mail className="w-5 h-5 text-[#00C853]" />
@@ -59,6 +88,7 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-semibold text-[#1A2332] font-grotesk">Email</h3>
                     <p className="text-[#5A6A7A] text-sm">info@furalaundryanddrycleaner.com</p>
+                    <p className="text-[#5A6A7A] text-sm">izihirekellya@gmail.com</p>
                   </div>
                 </div>
 
@@ -68,65 +98,15 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-[#1A2332] font-grotesk">Operating Hours</h3>
-                    <p className="text-[#5A6A7A] text-sm">Monday - Saturday: 7:00 AM - 7:00 PM</p>
+                    <p className="text-[#5A6A7A] text-sm">Monday - Saturday: 8:00 AM - 6:00 PM</p>
                     <p className="text-[#FF6F00] text-sm font-medium">Sunday: Closed</p>
                   </div>
                 </div>
               </div>
-
-              {/* WhatsApp CTA */}
-              <div className="mt-8 p-6 bg-[#25D366]/10 rounded-xl border border-[#25D366]/20">
-                <div className="flex items-center gap-3 mb-3">
-                  <MessageCircle className="w-6 h-6 text-[#25D366]" />
-                  <h3 className="font-semibold text-[#1A2332] font-grotesk">Chat on WhatsApp</h3>
-                </div>
-                <p className="text-sm text-[#5A6A7A] mb-4">
-                  Fastest way to reach us! Send us a message on WhatsApp for quick responses.
-                </p>
-                <a
-                  href="https://wa.me/250784649169"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Button className="bg-[#25D366] hover:bg-[#20BD5A] text-white">
-                    <MessageCircle className="w-4 h-4 mr-2" />
-                    Chat Now
-                  </Button>
-                </a>
-              </div>
             </div>
 
             {/* Contact Form */}
-            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-              <h2 className="text-2xl font-bold text-[#1A2332] mb-6 font-grotesk">Send a Message</h2>
-              <form className="space-y-5">
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name" className="text-sm font-medium text-[#1A2332]">Full Name</Label>
-                    <Input id="name" placeholder="Your name" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone" className="text-sm font-medium text-[#1A2332]">Phone</Label>
-                    <Input id="phone" placeholder="+250 7XX XXX XXX" />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-sm font-medium text-[#1A2332]">Email</Label>
-                  <Input id="email" type="email" placeholder="you@example.com" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="subject" className="text-sm font-medium text-[#1A2332]">Subject</Label>
-                  <Input id="subject" placeholder="How can we help?" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="message" className="text-sm font-medium text-[#1A2332]">Message</Label>
-                  <Textarea id="message" placeholder="Tell us more about your inquiry..." rows={5} />
-                </div>
-                <Button type="button" className="w-full bg-[#0066CC] hover:bg-[#0052A3] text-white">
-                  Send Message
-                </Button>
-              </form>
-            </div>
+            <ContactForm />
           </div>
         </div>
       </section>

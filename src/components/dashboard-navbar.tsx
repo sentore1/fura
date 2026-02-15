@@ -40,7 +40,7 @@ export default function DashboardNavbar() {
         <div className="flex gap-4 items-center">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" suppressHydrationWarning>
                 <UserCircle className="h-6 w-6 text-[#5A6A7A]" />
               </Button>
             </DropdownMenuTrigger>

@@ -6,7 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
   title: "Fura Laundry & Dry Cleaners | Kigali, Rwanda",
-  description: "Professional laundry and dry cleaning services in Kigali. Book online, pay with MTN MoMo, and get free pickup & delivery.",
+  description: "Professional laundry and dry cleaning services in Kigali. Book online, pay with MTN MoMo, and get pickup & delivery.",
 };
 
 export default function RootLayout({

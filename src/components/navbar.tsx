@@ -37,6 +37,9 @@ export default function Navbar() {
           <Link href="/services" className="text-sm font-medium text-[#5A6A7A] hover:text-[#0066CC] transition-colors">
             Services
           </Link>
+          <Link href="/blog" className="text-sm font-medium text-[#5A6A7A] hover:text-[#0066CC] transition-colors">
+            Blog
+          </Link>
           <Link href="/about" className="text-sm font-medium text-[#5A6A7A] hover:text-[#0066CC] transition-colors">
             Our Story
           </Link>

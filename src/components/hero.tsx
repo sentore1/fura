@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, Clock, Leaf, Truck } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
-export default function Hero() {
+export default function Hero({ slides: initialSlides }: { slides?: { image_url: string }[] }) {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const slides = [
+  const slides = initialSlides?.map(s => s.image_url) || [
     "/New folder/slide/35977.jpg",
     "/New folder/slide/51763.jpg",
     "/New folder/slide/53202.jpg"
@@ -74,7 +75,7 @@ export default function Hero() {
                   <div className="w-10 h-10 rounded-full bg-[#00B8D4]/15 flex items-center justify-center">
                     <Truck className="w-5 h-5 text-[#00B8D4]" />
                   </div>
-                  <span className="text-sm font-medium text-[#1A2332]">Free Pickup & Delivery</span>
+                  <span className="text-sm font-medium text-[#1A2332]">Pickup & Delivery</span>
                 </div>
                 <div className="flex items-center gap-3 justify-center lg:justify-start bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-sm">
                   <div className="w-10 h-10 rounded-full bg-[#0066CC]/15 flex items-center justify-center">
@@ -95,11 +96,13 @@ export default function Hero() {
             <div className="relative">
               <div className="relative w-full aspect-square max-w-lg mx-auto overflow-hidden rounded-2xl shadow-2xl">
                 {slides.map((slide, index) => (
-                  <img
+                  <Image
                     key={slide}
                     src={slide}
                     alt={`Laundry Service ${index + 1}`}
-                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
+                    fill
+                    priority={index === 0}
+                    className={`object-cover transition-opacity duration-1000 ${
                       index === currentSlide ? 'opacity-100' : 'opacity-0'
                     }`}
                   />

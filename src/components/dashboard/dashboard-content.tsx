@@ -4,7 +4,7 @@ import { useState } from "react";
 import { User } from "@supabase/supabase-js";
 import {
   Package, Clock, CheckCircle, Truck, ShoppingCart,
-  BarChart3, Calendar, Users, ArrowRight, Zap
+  BarChart3, Calendar, Users, ArrowRight, Zap, Settings, MapPin, MessageSquare, FileText, Image
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -61,6 +61,40 @@ export function DashboardContent({
             <p className="text-[#5A6A7A] text-sm">{user.email}</p>
           </div>
           <div className="flex gap-3">
+            {isAdmin && (
+              <>
+                <Link href="/dashboard/services">
+                  <Button variant="outline">
+                    <Settings className="w-4 h-4 mr-2" />
+                    Services
+                  </Button>
+                </Link>
+                <Link href="/dashboard/locations">
+                  <Button variant="outline">
+                    <MapPin className="w-4 h-4 mr-2" />
+                    Locations
+                  </Button>
+                </Link>
+                <Link href="/dashboard/blog">
+                  <Button variant="outline">
+                    <FileText className="w-4 h-4 mr-2" />
+                    Blog
+                  </Button>
+                </Link>
+                <Link href="/dashboard/messages">
+                  <Button variant="outline">
+                    <MessageSquare className="w-4 h-4 mr-2" />
+                    Messages
+                  </Button>
+                </Link>
+                <Link href="/dashboard/slides">
+                  <Button variant="outline">
+                    <Image className="w-4 h-4 mr-2" />
+                    Slides
+                  </Button>
+                </Link>
+              </>
+            )}
             <Link href="/booking">
               <Button className="bg-[#0066CC] hover:bg-[#0052A3] text-white">
                 <ShoppingCart className="w-4 h-4 mr-2" />

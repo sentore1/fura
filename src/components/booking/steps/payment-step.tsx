@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Loader2, Smartphone } from "lucide-react";
+import { CheckCircle, Loader2, Smartphone, MessageCircle } from "lucide-react";
 import { createClient } from "../../../../supabase/client";
 import type { BookingData } from "../booking-flow";
 import QRCode from "qrcode";
@@ -181,6 +181,30 @@ export function PaymentStep({
             <li>You&apos;ll receive a confirmation SMS</li>
           </ol>
         </div>
+      </div>
+
+      {/* WhatsApp Order Button */}
+      <div className="bg-[#25D366]/10 border border-[#25D366]/30 rounded-xl p-6 mb-6">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-12 h-12 rounded-xl bg-[#25D366] flex items-center justify-center">
+            <MessageCircle className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-[#1A2332] font-grotesk">Order via WhatsApp</h3>
+            <p className="text-xs text-[#5A6A7A]">Chat with us to place your order</p>
+          </div>
+        </div>
+        <a
+          href={`https://wa.me/250788000000?text=${encodeURIComponent(
+            `Hi, I'd like to place an order:\n\nServices:\n${bookingData.items.map(item => `- ${item.service.name} x${item.quantity}`).join('\n')}\n\nPickup: ${bookingData.pickupDate} at ${bookingData.pickupTime}\nAddress: ${bookingData.pickupAddress}\nTotal: ${bookingData.totalAmount.toLocaleString()} RWF`
+          )}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-[#25D366] text-white rounded-lg font-semibold hover:bg-[#20BA5A] transition-colors w-full justify-center"
+        >
+          <MessageCircle className="w-5 h-5" />
+          Order via WhatsApp
+        </a>
       </div>
 
       {/* Order Summary */}
