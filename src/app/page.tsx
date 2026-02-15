@@ -221,7 +221,7 @@ export default async function Home() {
             <div className="flex-shrink-0">
               <div className="w-40 h-40 rounded-2xl bg-[#FFCC00] flex items-center justify-center">
                 <div className="text-center">
-                  <div className="text-2xl font-extrabold text-black font-grotesk">MTN</div>
+                  <div className="text-4xl font-extrabold text-black">MTN</div>
                   <div className="text-sm font-bold text-black">MoMo</div>
                 </div>
               </div>
