@@ -32,7 +32,7 @@ export default function WhatsAppFloat({ services }: { services: Service[] }) {
     setService('');
   };
 
-  const categories = [...new Set(services.map(s => s.category))];
+  const categories = Array.from(new Set(services.map(s => s.category)));
   const filteredServices = category ? services.filter(s => s.category === category) : [];
 
   return (

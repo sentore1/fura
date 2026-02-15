@@ -9,7 +9,7 @@ import type { BookingData } from "@/components/booking/booking-flow";
 import { GiIronCross, GiWashingMachine, GiClothes, GiDress, GiTrousers, GiLabCoat, GiSofa, GiBed, GiSparkles } from "react-icons/gi";
 import { MdLocalLaundryService, MdIron, MdCurtains, MdWindow } from "react-icons/md";
 import { FaTshirt, FaUserTie } from "react-icons/fa";
-import { TbIroning3, TbRug } from "react-icons/tb";
+import { TbIroning3 } from "react-icons/tb";
 import { AiOutlineAppstore } from "react-icons/ai";
 import { PiDressFill, PiCoatHangerFill } from "react-icons/pi";
 import { LuSofa } from "react-icons/lu";
