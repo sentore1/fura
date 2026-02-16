@@ -8,6 +8,8 @@ import { createClient } from "../../supabase/server";
 import { ServicesScroll } from "@/components/services-scroll";
 import WhatsAppFloat from "@/components/whatsapp-float";
 
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
   const supabase = await createClient();
   const { data: services } = await supabase

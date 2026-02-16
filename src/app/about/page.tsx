@@ -2,6 +2,9 @@ import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { Shield, Heart, Target, Eye, Award, Users } from "lucide-react";
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-[#F8FAFB]">

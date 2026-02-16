@@ -4,6 +4,8 @@ import { createClient } from "../../../supabase/server";
 import Link from "next/link";
 import { Calendar } from "lucide-react";
 
+export const dynamic = 'force-dynamic';
+
 export default async function BlogPage() {
   const supabase = await createClient();
   const { data: posts } = await supabase

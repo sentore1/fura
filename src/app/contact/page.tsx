@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { createClient } from "../../../supabase/server";
 import { ContactForm } from "@/components/contact/contact-form";
 
+export const dynamic = 'force-dynamic';
+
 export default async function ContactPage() {
   const supabase = await createClient();
   const { data: locations } = await supabase
