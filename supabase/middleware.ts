@@ -3,6 +3,15 @@ import { type NextRequest, NextResponse } from "next/server";
 
 export const updateSession = async (request: NextRequest) => {
   try {
+    // Skip middleware for static files and API routes
+    if (
+      request.nextUrl.pathname.startsWith('/_next') ||
+      request.nextUrl.pathname.startsWith('/api') ||
+      request.nextUrl.pathname.includes('.')
+    ) {
+      return NextResponse.next();
+    }
+
     let response = NextResponse.next({
       request: {
         headers: request.headers,

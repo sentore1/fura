@@ -13,7 +13,12 @@ const nextConfig = {
                 hostname: 'storage.googleapis.com',
             },
         ],
-    }
+    },
+    experimental: {
+        serverActions: {
+            bodySizeLimit: '2mb',
+        },
+    },
 };
 
 
