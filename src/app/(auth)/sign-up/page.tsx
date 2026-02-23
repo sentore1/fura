@@ -24,7 +24,7 @@ export default async function Signup(props: {
   return (
     <>
       <Navbar />
-      <div className="flex min-h-screen flex-col items-center justify-center bg-[#F8FAFB] px-4 py-8">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-white px-4 py-8">
         <div className="w-full max-w-md rounded-2xl border border-border bg-white p-8 shadow-sm">
           <UrlProvider>
             <form className="flex flex-col space-y-6">
