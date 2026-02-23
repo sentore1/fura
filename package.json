@@ -3,8 +3,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "postbuild": "node -e \"const fs = require('fs'); const path = '.next/server/middleware.js.nft.json'; if (!fs.existsSync(path)) { fs.writeFileSync(path, JSON.stringify({ version: 1, files: [] })); }\""
+    "start": "next start"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
