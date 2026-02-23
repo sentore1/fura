@@ -19,9 +19,7 @@ const nextConfig = {
             bodySizeLimit: '2mb',
         },
     },
-    outputFileTracingIncludes: {
-        '/': ['./node_modules/**/*'],
-    },
+    outputFileTracing: true,
 };
 
 
