@@ -19,7 +19,6 @@ const nextConfig = {
             bodySizeLimit: '2mb',
         },
     },
-    outputFileTracing: true,
 };
 
 

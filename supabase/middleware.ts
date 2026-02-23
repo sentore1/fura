@@ -1,10 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
-export const config = {
-  runtime: 'nodejs',
-};
-
 export const updateSession = async (request: NextRequest) => {
   try {
     // Skip middleware for static files and API routes
