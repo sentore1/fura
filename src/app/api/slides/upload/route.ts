@@ -24,15 +24,14 @@ export async function POST(req: NextRequest) {
     .select('display_order')
     .eq('type', type)
     .order('display_order', { ascending: false })
-    .limit(1)
-    .single();
+    .limit(1);
 
   const { data: slide } = await supabase
     .from('slides')
     .insert({
       image_url: `/uploads/${filename}`,
       type,
-      display_order: (maxOrder?.display_order || 0) + 1,
+      display_order: (maxOrder?.[0]?.display_order || 0) + 1,
     })
     .select()
     .single();
