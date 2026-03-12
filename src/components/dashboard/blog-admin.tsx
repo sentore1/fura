@@ -39,9 +39,9 @@ export function BlogAdmin({ posts }: { posts: BlogPost[] }) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Check file size (2MB limit)
-    if (file.size > 2 * 1024 * 1024) {
-      alert('File size must be less than 2MB');
+    // Check file size (5MB limit)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size must be less than 5MB');
       return;
     }
 
@@ -56,22 +56,31 @@ export function BlogAdmin({ posts }: { posts: BlogPost[] }) {
       const uploadFormData = new FormData();
       uploadFormData.append("file", file);
 
+      console.log('Uploading file:', file.name, file.size, file.type);
+      
       const res = await fetch("/api/upload", {
         method: "POST",
         body: uploadFormData,
       });
 
+      console.log('Upload response status:', res.status);
+      
       if (!res.ok) {
-        throw new Error(`Upload failed: ${res.status}`);
+        const errorText = await res.text();
+        console.error('Upload failed:', res.status, errorText);
+        throw new Error(`Upload failed: ${res.status} - ${errorText}`);
       }
 
       const data = await res.json();
+      console.log('Upload response data:', data);
+      
       if (data.error) {
         throw new Error(data.error);
       }
       
       if (data.url) {
         setFormData(prev => ({ ...prev, image_url: data.url }));
+        console.log('Image uploaded successfully:', data.url);
       }
     } catch (error) {
       console.error('Upload error:', error);
