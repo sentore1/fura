@@ -1,11 +1,18 @@
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { createClient } from "../../../../supabase/server";
+import { createBuildClient } from "../../../../supabase/build-client";
 import { notFound } from "next/navigation";
 import { Calendar } from "lucide-react";
 
 export async function generateStaticParams() {
-  return [];
+  const supabase = createBuildClient();
+  const { data: posts } = await supabase
+    .from("blog_posts")
+    .select("slug")
+    .eq("is_published", true);
+  
+  return posts?.map((post) => ({ slug: post.slug })) || [];
 }
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
