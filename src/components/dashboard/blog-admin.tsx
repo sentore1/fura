@@ -39,20 +39,46 @@ export function BlogAdmin({ posts }: { posts: BlogPost[] }) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setUploading(true);
-    const uploadFormData = new FormData();
-    uploadFormData.append("file", file);
-
-    const res = await fetch("/api/upload", {
-      method: "POST",
-      body: uploadFormData,
-    });
-
-    const data = await res.json();
-    if (data.url) {
-      setFormData(prev => ({ ...prev, image_url: data.url }));
+    // Check file size (2MB limit)
+    if (file.size > 2 * 1024 * 1024) {
+      alert('File size must be less than 2MB');
+      return;
     }
-    setUploading(false);
+
+    // Check file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const uploadFormData = new FormData();
+      uploadFormData.append("file", file);
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: uploadFormData,
+      });
+
+      if (!res.ok) {
+        throw new Error(`Upload failed: ${res.status}`);
+      }
+
+      const data = await res.json();
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      
+      if (data.url) {
+        setFormData(prev => ({ ...prev, image_url: data.url }));
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert(`Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleAdd = async () => {
