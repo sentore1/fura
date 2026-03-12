@@ -195,7 +195,7 @@ export function PaymentStep({
           </div>
         </div>
         <a
-          href={`https://wa.me/250788000000?text=${encodeURIComponent(
+          href={`https://wa.me/250784649169?text=${encodeURIComponent(
             `Hi, I'd like to place an order:\n\nServices:\n${bookingData.items.map(item => `- ${item.service.name} x${item.quantity}`).join('\n')}\n\nPickup: ${bookingData.pickupDate} at ${bookingData.pickupTime}\nAddress: ${bookingData.pickupAddress}\nTotal: ${bookingData.totalAmount.toLocaleString()} RWF`
           )}`}
           target="_blank"

@@ -195,7 +195,7 @@ export function CalendarScheduling({
                     <br />Please confirm availability via WhatsApp.
                   </p>
                   <a
-                    href="https://wa.me/250788888888?text=Hi, I'd like to confirm availability for pickup on a holiday"
+                    href="https://wa.me/250784649169?text=Hi, I'd like to confirm availability for pickup on a holiday"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#20BA5A] text-white px-6 py-3 rounded-lg font-medium transition-colors"
