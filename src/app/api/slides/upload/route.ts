@@ -4,37 +4,54 @@ import { writeFile } from 'fs/promises';
 import { join } from 'path';
 
 export async function POST(req: NextRequest) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const formData = await req.formData();
-  const file = formData.get('file') as File;
-  const type = formData.get('type') as string;
+    const formData = await req.formData();
+    const file = formData.get('file') as File;
+    const type = formData.get('type') as string;
 
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-  const filename = `${Date.now()}-${file.name}`;
-  const path = join(process.cwd(), 'public', 'uploads', filename);
-  
-  await writeFile(path, buffer);
+    if (!file) {
+      return NextResponse.json({ error: 'No file provided' }, { status: 400 });
+    }
 
-  const { data: maxOrder } = await supabase
-    .from('slides')
-    .select('display_order')
-    .eq('type', type)
-    .order('display_order', { ascending: false })
-    .limit(1);
+    if (!type || !['hero', 'carousel'].includes(type)) {
+      return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
+    }
 
-  const { data: slide } = await supabase
-    .from('slides')
-    .insert({
-      image_url: `/uploads/${filename}`,
-      type,
-      display_order: (maxOrder?.[0]?.display_order || 0) + 1,
-    })
-    .select()
-    .single();
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    const filename = `${Date.now()}-${file.name}`;
+    const path = join(process.cwd(), 'public', 'uploads', filename);
+    
+    await writeFile(path, buffer);
 
-  return NextResponse.json(slide);
+    const { data: maxOrder } = await supabase
+      .from('slides')
+      .select('display_order')
+      .eq('type', type)
+      .order('display_order', { ascending: false })
+      .limit(1);
+
+    const { data: slide, error } = await supabase
+      .from('slides')
+      .insert({
+        image_url: `/uploads/${filename}`,
+        type,
+        display_order: (maxOrder?.[0]?.display_order || 0) + 1,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      return NextResponse.json({ error: 'Database error: ' + error.message }, { status: 500 });
+    }
+
+    return NextResponse.json(slide);
+  } catch (error) {
+    console.error('Upload error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

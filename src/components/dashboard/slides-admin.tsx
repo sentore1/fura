@@ -23,31 +23,65 @@ export default function SlidesAdmin({ initialSlides }: { initialSlides: Slide[] 
     if (!file) return;
 
     setUploading(true);
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('type', activeTab);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('type', activeTab);
 
-    const res = await fetch('/api/slides/upload', { method: 'POST', body: formData });
-    if (res.ok) {
+      const res = await fetch('/api/slides/upload', { method: 'POST', body: formData });
+      
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Upload failed');
+      }
+      
       const newSlide = await res.json();
       setSlides([...slides, newSlide]);
+      alert('Image uploaded successfully!');
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('Failed to upload image: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    } finally {
+      setUploading(false);
+      // Reset the input
+      e.target.value = '';
     }
-    setUploading(false);
   };
 
   const toggleActive = async (id: string, is_active: boolean) => {
-    await fetch('/api/slides', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, is_active: !is_active }),
-    });
-    setSlides(slides.map(s => s.id === id ? { ...s, is_active: !is_active } : s));
+    try {
+      const res = await fetch('/api/slides', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, is_active: !is_active }),
+      });
+      
+      if (!res.ok) {
+        throw new Error('Failed to update slide status');
+      }
+      
+      setSlides(slides.map(s => s.id === id ? { ...s, is_active: !is_active } : s));
+    } catch (error) {
+      console.error('Toggle error:', error);
+      alert('Failed to update slide status');
+    }
   };
 
   const deleteSlide = async (id: string) => {
     if (!confirm('Delete this slide?')) return;
-    await fetch(`/api/slides?id=${id}`, { method: 'DELETE' });
-    setSlides(slides.filter(s => s.id !== id));
+    
+    try {
+      const res = await fetch(`/api/slides?id=${id}`, { method: 'DELETE' });
+      
+      if (!res.ok) {
+        throw new Error('Failed to delete slide');
+      }
+      
+      setSlides(slides.filter(s => s.id !== id));
+    } catch (error) {
+      console.error('Delete error:', error);
+      alert('Failed to delete slide');
+    }
   };
 
   return (
