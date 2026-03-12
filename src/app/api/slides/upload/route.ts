@@ -1,8 +1,6 @@
 import { createClient } from '../../../../../supabase/server';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile } from 'fs/promises';
-import { join } from 'path';
 
 export async function POST(req: NextRequest) {
   try {
@@ -33,19 +31,32 @@ export async function POST(req: NextRequest) {
 
     console.log('Processing file:', file.name, 'type:', type);
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    const filename = `${Date.now()}-${file.name}`;
-    const path = join(process.cwd(), 'public', 'uploads', filename);
-    
-    await writeFile(path, buffer);
-    console.log('File written to:', path);
-
-    // Use service client for admin operations
+    // Use service client for storage operations
     const serviceSupabase = createServiceClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_KEY!
     );
+
+    // Upload to Supabase Storage
+    const filename = `${Date.now()}-${file.name}`;
+    const { data: uploadData, error: uploadError } = await serviceSupabase.storage
+      .from('uploads')
+      .upload(filename, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
+
+    if (uploadError) {
+      console.error('Storage upload error:', uploadError);
+      return NextResponse.json({ error: 'Failed to upload file: ' + uploadError.message }, { status: 500 });
+    }
+
+    // Get public URL
+    const { data: { publicUrl } } = serviceSupabase.storage
+      .from('uploads')
+      .getPublicUrl(filename);
+
+    console.log('File uploaded to storage:', publicUrl);
 
     // Get max display order
     const { data: maxOrder, error: maxOrderError } = await serviceSupabase
@@ -67,7 +78,7 @@ export async function POST(req: NextRequest) {
     const { data: slide, error: insertError } = await serviceSupabase
       .from('slides')
       .insert({
-        image_url: `/uploads/${filename}`,
+        image_url: publicUrl,
         type,
         display_order: newDisplayOrder,
         is_active: true
