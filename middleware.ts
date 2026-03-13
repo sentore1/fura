@@ -3,6 +3,7 @@ import { type NextRequest, NextResponse } from "next/server";
 
 export async function middleware(request: NextRequest) {
   try {
+    // Skip middleware for static files and API routes
     if (
       request.nextUrl.pathname.startsWith('/_next') ||
       request.nextUrl.pathname.startsWith('/api') ||
@@ -42,6 +43,7 @@ export async function middleware(request: NextRequest) {
 
     const { error } = await supabase.auth.getUser();
 
+    // Redirect to sign-in for protected routes
     if (
       (request.nextUrl.pathname.startsWith("/dashboard") ||
        request.nextUrl.pathname.startsWith("/booking") ||
@@ -63,6 +65,12 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 };
