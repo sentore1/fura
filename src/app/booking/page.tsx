@@ -2,10 +2,15 @@ import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { BookingFlow } from "@/components/booking/booking-flow";
 import { createClient } from "../../../supabase/server";
+import { redirect } from "next/navigation";
 
 export default async function BookingPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user }, error } = await supabase.auth.getUser();
+
+  if (error || !user) {
+    redirect("/sign-in");
+  }
 
   const { data: services } = await supabase
     .from("services")
