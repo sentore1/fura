@@ -9,6 +9,7 @@ import { PiDressFill, PiCoatHangerFill } from "react-icons/pi";
 import { AiOutlineAppstore } from "react-icons/ai";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ServiceSelection } from "@/components/booking/steps/service-selection";
+import { useDeliverySettings } from "@/hooks/useDeliverySettings";
 import type { BookingData } from "@/components/booking/booking-flow";
 
 interface Service {
@@ -45,9 +46,14 @@ export function ServicesScroll({ services }: { services: Service[] }) {
   const [canScrollRight, setCanScrollRight] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const { calculateDeliveryFee } = useDeliverySettings();
   const [bookingData, setBookingData] = useState<BookingData>({
     items: [],
     isExpress: false,
+    hasPickup: false,
+    hasDelivery: false,
+    pickupDistance: 0,
+    deliveryDistance: 0,
     pickupDate: "",
     pickupTime: "",
     customerName: "",
@@ -58,18 +64,28 @@ export function ServicesScroll({ services }: { services: Service[] }) {
     totalAmount: 0,
   });
 
-  const calculateTotal = (items: any[], isExpress: boolean) => {
+  const calculateTotal = (items: any[], isExpress: boolean, hasPickup: boolean = false, hasDelivery: boolean = false, pickupDistance: number = 0, deliveryDistance: number = 0) => {
     const subtotal = items.reduce(
       (sum, item) => sum + item.service.price_rwf * item.quantity,
       0
     );
-    return isExpress ? Math.round(subtotal * 1.5) : subtotal;
+    
+    let deliveryFee = 0;
+    if (hasPickup) {
+      deliveryFee += calculateDeliveryFee(pickupDistance);
+    }
+    if (hasDelivery) {
+      deliveryFee += calculateDeliveryFee(deliveryDistance);
+    }
+    
+    const total = subtotal + deliveryFee;
+    return isExpress ? Math.round(total * 1.5) : total;
   };
 
   const updateBookingData = (updates: Partial<BookingData>) => {
     setBookingData((prev) => {
       const updated = { ...prev, ...updates };
-      updated.totalAmount = calculateTotal(updated.items, updated.isExpress);
+      updated.totalAmount = calculateTotal(updated.items, updated.isExpress, updated.hasPickup, updated.hasDelivery, updated.pickupDistance, updated.deliveryDistance);
       return updated;
     });
   };
@@ -79,6 +95,10 @@ export function ServicesScroll({ services }: { services: Service[] }) {
     setBookingData({
       items: [{ service, quantity: 1 }],
       isExpress: false,
+      hasPickup: false,
+      hasDelivery: false,
+      pickupDistance: 0,
+      deliveryDistance: 0,
       pickupDate: "",
       pickupTime: "",
       customerName: "",

@@ -19,7 +19,7 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-[#5A6A7A] text-sm leading-relaxed mb-4">
-              Kigali&apos;s trusted laundry service since 2020. Professional care for your garments with free pickup and delivery.
+              Kigali&apos;s trusted laundry service since 2020. Professional care for your garments.
             </p>
             <div className="flex gap-4 mt-4">
               <a href="https://wa.me/250784649169" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-[#25D366] hover:text-white transition-colors text-gray-600">

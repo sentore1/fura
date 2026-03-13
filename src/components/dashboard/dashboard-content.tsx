@@ -69,6 +69,12 @@ export function DashboardContent({
                     Services
                   </Button>
                 </Link>
+                <Link href="/dashboard/settings">
+                  <Button variant="outline">
+                    <Settings className="w-4 h-4 mr-2" />
+                    Pricing
+                  </Button>
+                </Link>
                 <Link href="/dashboard/locations">
                   <Button variant="outline">
                     <MapPin className="w-4 h-4 mr-2" />

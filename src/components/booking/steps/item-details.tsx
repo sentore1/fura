@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { MapPin, User, Phone } from "lucide-react";
+import { useDeliverySettings } from "@/hooks/useDeliverySettings";
 import type { BookingData } from "../booking-flow";
 
 export function ItemDetails({
@@ -18,6 +19,7 @@ export function ItemDetails({
   onNext: () => void;
   onPrev: () => void;
 }) {
+  const { calculateDeliveryFee } = useDeliverySettings();
   const isValid =
     bookingData.customerName.trim() &&
     bookingData.customerPhone.trim() &&
@@ -106,11 +108,29 @@ export function ItemDetails({
               </span>
             </div>
           ))}
+          {bookingData.hasPickup && (
+            <div className="flex justify-between text-sm text-[#0066CC]">
+              <span className="font-medium">Pickup ({bookingData.pickupDistance}km)</span>
+              <span className="font-mono-data font-medium">
+                +{calculateDeliveryFee(bookingData.pickupDistance).toLocaleString()} RWF
+              </span>
+            </div>
+          )}
+          {bookingData.hasDelivery && (
+            <div className="flex justify-between text-sm text-[#0066CC]">
+              <span className="font-medium">Delivery ({bookingData.deliveryDistance}km)</span>
+              <span className="font-mono-data font-medium">
+                +{calculateDeliveryFee(bookingData.deliveryDistance).toLocaleString()} RWF
+              </span>
+            </div>
+          )}
           {bookingData.isExpress && (
             <div className="flex justify-between text-sm text-[#FF6F00]">
               <span className="font-medium">Express surcharge (+50%)</span>
               <span className="font-mono-data font-medium">
-                +{(bookingData.totalAmount - bookingData.items.reduce((s, i) => s + i.service.price_rwf * i.quantity, 0)).toLocaleString()} RWF
+                +{(bookingData.totalAmount - (bookingData.items.reduce((s, i) => s + i.service.price_rwf * i.quantity, 0) + 
+                  (bookingData.hasPickup ? calculateDeliveryFee(bookingData.pickupDistance) : 0) +
+                  (bookingData.hasDelivery ? calculateDeliveryFee(bookingData.deliveryDistance) : 0))).toLocaleString()} RWF
               </span>
             </div>
           )}

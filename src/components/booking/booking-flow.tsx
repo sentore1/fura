@@ -6,6 +6,7 @@ import { CalendarScheduling } from "./steps/calendar-scheduling";
 import { ItemDetails } from "./steps/item-details";
 import { PaymentStep } from "./steps/payment-step";
 import { Check } from "lucide-react";
+import { useDeliverySettings } from "@/hooks/useDeliverySettings";
 
 interface Service {
   id: string;
@@ -24,6 +25,10 @@ export interface CartItem {
 export interface BookingData {
   items: CartItem[];
   isExpress: boolean;
+  hasPickup: boolean;
+  hasDelivery: boolean;
+  pickupDistance: number;
+  deliveryDistance: number;
   pickupDate: string;
   pickupTime: string;
   customerName: string;
@@ -51,9 +56,14 @@ export function BookingFlow({
   userEmail: string | null;
 }) {
   const [currentStep, setCurrentStep] = useState(1);
+  const { calculateDeliveryFee } = useDeliverySettings();
   const [bookingData, setBookingData] = useState<BookingData>({
     items: [],
     isExpress: false,
+    hasPickup: false,
+    hasDelivery: false,
+    pickupDistance: 0,
+    deliveryDistance: 0,
     pickupDate: "",
     pickupTime: "",
     customerName: "",
@@ -64,18 +74,28 @@ export function BookingFlow({
     totalAmount: 0,
   });
 
-  const calculateTotal = (items: CartItem[], isExpress: boolean) => {
+  const calculateTotal = (items: CartItem[], isExpress: boolean, hasPickup: boolean, hasDelivery: boolean, pickupDistance: number, deliveryDistance: number) => {
     const subtotal = items.reduce(
       (sum, item) => sum + item.service.price_rwf * item.quantity,
       0
     );
-    return isExpress ? Math.round(subtotal * 1.5) : subtotal;
+    
+    let deliveryFee = 0;
+    if (hasPickup) {
+      deliveryFee += calculateDeliveryFee(pickupDistance);
+    }
+    if (hasDelivery) {
+      deliveryFee += calculateDeliveryFee(deliveryDistance);
+    }
+    
+    const total = subtotal + deliveryFee;
+    return isExpress ? Math.round(total * 1.5) : total;
   };
 
   const updateBookingData = (updates: Partial<BookingData>) => {
     setBookingData((prev) => {
       const updated = { ...prev, ...updates };
-      updated.totalAmount = calculateTotal(updated.items, updated.isExpress);
+      updated.totalAmount = calculateTotal(updated.items, updated.isExpress, updated.hasPickup, updated.hasDelivery, updated.pickupDistance, updated.deliveryDistance);
       return updated;
     });
   };

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Minus, Zap, ShoppingCart } from "lucide-react";
+import { Plus, Minus, Zap, ShoppingCart, Truck, MapPin } from "lucide-react";
 import { FaTshirt, FaUserTie } from "react-icons/fa";
 import { GiTrousers, GiLabCoat, GiSparkles } from "react-icons/gi";
 import { MdLocalLaundryService, MdWindow } from "react-icons/md";
@@ -12,6 +12,9 @@ import { AiOutlineAppstore } from "react-icons/ai";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useDeliverySettings } from "@/hooks/useDeliverySettings";
 import type { BookingData, CartItem } from "../booking-flow";
 
 interface Service {
@@ -62,6 +65,7 @@ export function ServiceSelection({
 }) {
   const [activeCategory, setActiveCategory] = useState("wash_fold");
   const categories = Object.keys(categoryLabels);
+  const { calculateDeliveryFee, settings } = useDeliverySettings();
 
   const getQuantity = (serviceId: string) => {
     const item = bookingData.items.find((i) => i.service.id === serviceId);
@@ -95,6 +99,10 @@ export function ServiceSelection({
     (sum, i) => sum + i.service.price_rwf * i.quantity,
     0
   );
+  
+  const deliveryFee = 
+    (bookingData.hasPickup ? calculateDeliveryFee(bookingData.pickupDistance) : 0) +
+    (bookingData.hasDelivery ? calculateDeliveryFee(bookingData.deliveryDistance) : 0);
 
   return (
     <div>
@@ -188,6 +196,79 @@ export function ServiceSelection({
         />
       </div>
 
+      {/* Pickup & Delivery Options */}
+      <div className="space-y-4 mb-6">
+        <h3 className="font-semibold text-[#1A2332] font-grotesk">Pickup & Delivery</h3>
+        
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div className="p-4 rounded-xl border border-gray-200">
+            <div className="flex items-center space-x-2 mb-3">
+              <Checkbox
+                id="pickup"
+                checked={bookingData.hasPickup}
+                onCheckedChange={(checked) => updateBookingData({ hasPickup: !!checked })}
+              />
+              <Label htmlFor="pickup" className="flex items-center gap-2 cursor-pointer">
+                <Truck className="w-4 h-4 text-[#0066CC]" />
+                Pickup Service
+              </Label>
+            </div>
+            {bookingData.hasPickup && (
+              <div className="space-y-2">
+                <Label className="text-xs text-[#5A6A7A]">Distance (km)</Label>
+                <Input
+                  type="number"
+                  min="0.1"
+                  step="0.1"
+                  value={bookingData.pickupDistance || ""}
+                  onChange={(e) => updateBookingData({ pickupDistance: parseFloat(e.target.value) || 0 })}
+                  placeholder="0.5"
+                  className="h-8 text-sm"
+                />
+                <p className="text-xs text-[#5A6A7A]">
+                  Fee: {calculateDeliveryFee(bookingData.pickupDistance).toLocaleString()} RWF
+                </p>
+              </div>
+            )}
+          </div>
+          
+          <div className="p-4 rounded-xl border border-gray-200">
+            <div className="flex items-center space-x-2 mb-3">
+              <Checkbox
+                id="delivery"
+                checked={bookingData.hasDelivery}
+                onCheckedChange={(checked) => updateBookingData({ hasDelivery: !!checked })}
+              />
+              <Label htmlFor="delivery" className="flex items-center gap-2 cursor-pointer">
+                <MapPin className="w-4 h-4 text-[#0066CC]" />
+                Delivery Service
+              </Label>
+            </div>
+            {bookingData.hasDelivery && (
+              <div className="space-y-2">
+                <Label className="text-xs text-[#5A6A7A]">Distance (km)</Label>
+                <Input
+                  type="number"
+                  min="0.1"
+                  step="0.1"
+                  value={bookingData.deliveryDistance || ""}
+                  onChange={(e) => updateBookingData({ deliveryDistance: parseFloat(e.target.value) || 0 })}
+                  placeholder="0.5"
+                  className="h-8 text-sm"
+                />
+                <p className="text-xs text-[#5A6A7A]">
+                  Fee: {calculateDeliveryFee(bookingData.deliveryDistance).toLocaleString()} RWF
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        <div className="text-xs text-[#5A6A7A] bg-blue-50 p-3 rounded-lg">
+          <strong>Pricing:</strong> ≤{settings.free_distance_km}km = {settings.base_fee.toLocaleString()} RWF | &gt;{settings.free_distance_km}km = {settings.base_fee.toLocaleString()} + {settings.additional_km_fee.toLocaleString()} per additional km
+        </div>
+      </div>
+
       {/* Summary Bar */}
       <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border">
         <div className="flex items-center gap-3">
@@ -197,15 +278,26 @@ export function ServiceSelection({
             {bookingData.isExpress && (
               <span className="ml-2 text-xs text-[#FF6F00] font-semibold">EXPRESS</span>
             )}
+            {(bookingData.hasPickup || bookingData.hasDelivery) && (
+              <span className="ml-2 text-xs text-[#0066CC] font-semibold">
+                {bookingData.hasPickup && bookingData.hasDelivery ? "PICKUP + DELIVERY" : 
+                 bookingData.hasPickup ? "PICKUP" : "DELIVERY"}
+              </span>
+            )}
           </div>
         </div>
         <div className="text-right">
           <div className="font-mono-data font-bold text-lg text-[#0066CC]">
             {bookingData.totalAmount.toLocaleString()} RWF
           </div>
-          {bookingData.isExpress && subtotal > 0 && (
-            <div className="text-xs text-[#5A6A7A] line-through">
-              {subtotal.toLocaleString()} RWF
+          {(bookingData.isExpress || deliveryFee > 0) && (
+            <div className="text-xs text-[#5A6A7A] space-y-1">
+              {deliveryFee > 0 && (
+                <div>Delivery: +{deliveryFee.toLocaleString()} RWF</div>
+              )}
+              {bookingData.isExpress && (
+                <div>Express: +50%</div>
+              )}
             </div>
           )}
         </div>
